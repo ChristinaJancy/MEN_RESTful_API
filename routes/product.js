@@ -1,152 +1,74 @@
 const router = require("express").Router();
 const product = require("../models/product");
-const { verifyToken} = require("../validation");
+const { verifyToken } = require("../validation");
 
-// CRUD operations for products 
-
-// CREATE product (post) - /api/products 
+// Create new product
 router.post("/", verifyToken, (req, res) => {
-    data = req.body;
+//router.post("/", (req, res) => {
+    const data = req.body;
     product.insertMany(data)
-        .then(data => { res.send(data) })
-        .catch(err => {
-            res.status(500).send({ message: err.message })
-        })
+        .then(data => { res.status(201).send(data); })
+        .catch(err => { res.status(500).send({ message: err.message }); });
 });
 
-// READ all products (get)  - /api/products
 router.get("/", (req, res) => {
-    product.find()
-        .then(data => {
-            // the mapArray function is used to map the data to the required format
-            // see function bottom of this file
-            res.send(mapArrayProducts(data))
-
-        })
-        .catch(err => {
-            res.status(500).send({ message: err.message })
-        })
+    //advanced query by name
+    const name = req.query.name;
+ 
+    var condition = name ? { name: { $regex: new RegExp(name), $options: "i" } } : {};
+    product.find(condition)
+        .then(data => { res.send(data); })
+        .catch(err => { res.status(500).send({ message: err.message }); });
 });
 
-
-//READ all products in stock (get)  - /api/products/inStock:status
-//:status checks if the product is in stock using true/false
-router.get("/instock/:status", (req, res) => {
-    product.find({ inStock: req.params.status })
-        .then(data => {
-            res.send(mapArrayInStock(data))
-        })
-        .catch(err => {
-            res.status(500).send({ message: err.message })
-        })
+// Retrieve Products based on stock
+router.get("/instock", verifyToken, (req, res) => {
+    product.find({ inStock: true })
+        .then(data => { res.send(data); })
+        .catch(err => { res.status(500).send({ message: err }); })
 });
 
-//Read specific product based on id (get) - /api/products/:id
 router.get("/:id", (req, res) => {
     product.findById(req.params.id)
-        .then(data => { res.send(data) })
-        .catch(err => {
-            res.status(500).send({ message: err.message })
-        })
+        .then(data => { res.send(data); })
+        .catch(err => { res.status(500).send({ message: err.message }); });
 });
 
-// UPDATE specific product (put) - /api/products/:id 
-router.put("/:id", (req, res) => {
-
+// Update Product
+router.put("/:id", verifyToken, (req, res) => {
+//router.put("/:id", (req, res) => {
     const id = req.params.id;
+
     product.findByIdAndUpdate(id, req.body)
         .then(data => {
-            if (!data) {
-                res.status(404).send({ message: "Cannot update product with id=" + id + ". Maybe the product was not found!" });
-            }
-            else {
-                res.send({ message: "Product was successfully updated." });
-            }
+            if (!data)
+                res.status(404).send({ message: "Cannot update product with id=" + id + ". Maybe product was not found!" });
+            else
+                res.send({ message: "Product was updated successfully." });
         })
         .catch(err => {
-            res.status(500).send({ message: "Error updating product with id=" + id })
-        })
+            res.status(500).send({ message: "Error updating Product with id=" + id });
+        });
+
 });
 
-// Delete specific product (delete)-  /api/products/:id 
-router.delete("/:id", (req, res) => {
-
+// Delete Product
+//router.delete("/:id", (req, res) => {
+router.delete("/:id", verifyToken, (req, res) => {
     const id = req.params.id;
-    product.findByIdAndDelete(id)
+
+    product.findByIdAndRemove(id,{useFindAndModify: false})
         .then(data => {
             if (!data) {
-                res.status(404).send({ message: "Cannot delete product with id=" + id + ". Maybe the product was not found!" });
+                res.status(404).send({
+                    message: `Cannot delete Product with id=${id}. Maybe Product was not found!`
+                });
             }
-            else {
-                res.send({ message: "Product was successfully deleted." });
-            }
+            else { res.send({ message: "Product was deleted successfully!" }); }
         })
         .catch(err => {
-            res.status(500).send({ message: "Error deleting product with id=" + id })
-        })
+            res.status(500).send({ message: "Could not delete Product with id=" + id });
+        });
 });
-
-router.get("/price/:operator/:price", (req, res) => {
-
-    const operator = req.params.operator;
-    const price = req.params.price;
-    let filterExpr = {};
-
-    if (operator === "gt") {
-        filterExpr = { $gt: req.params.price };
-    }
-    else if (operator === "gte") {
-        filterExpr = { $gte: req.params.price };
-    }
-    else if (operator === "lt") {
-        filterExpr = { $lt: req.params.price };
-    }
-    else if (operator === "lte") {
-        filterExpr = { $lte: req.params.price };
-    }
-
-    product.find({ price: filterExpr })
-
-        .then(data => { res.send(data) })
-        .catch(err => {
-            res.status(500).send({ message: err.message })
-        })
-})
-
-// Function to map the data to the required format
-function mapArrayInStock(arr) {
-    let outputArray = arr.map(
-        element => {
-            return {
-                id: element._id,
-                name: element.name,
-                description: element.description,
-                price: element.price,
-                //link url
-                uri: `http://localhost:4000/api/products/${element._id}`
-            }
-        }
-    )
-    return outputArray;
-}
-
-function mapArrayProducts(arr) {
-    let outputArray = arr.map(
-        element => {
-            return {
-                id: element._id,
-                name: element.name,
-                description: element.description,
-                price: element.price,
-                inStock: element.inStock,
-                //link url
-                uri: `http://localhost:4000/api/products/${element._id}`
-            }
-        }
-    )
-    return outputArray;
-}
-
-
 
 module.exports = router;
