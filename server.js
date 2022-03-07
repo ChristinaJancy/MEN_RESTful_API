@@ -15,7 +15,7 @@ app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 //import routes and validation
 const authRoutes = require("./routes/auth");
-const productRoutes = require("./routes/product");
+const gameRoutes = require("./routes/game");
 
 // middleware defitions
 // parse requests of content-type - application/json
@@ -47,7 +47,7 @@ app.get("/api/welcome", (req,res) => {
 
 // authentication routes to secure the API endpoints
 app.use("/api/user", authRoutes); //authentication routes (register, login)
-app.use("/api/products", productRoutes); //CRUD routes
+app.use("/api/games", gameRoutes); //CRUD routes
 
 //start up server
 const PORT = process.env.PORT || 4000;

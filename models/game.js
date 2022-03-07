@@ -1,18 +1,18 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-let productSchema = new Schema(
+let gameSchema = new Schema(
   {
     name: { type: String, required: true, minlength: 4, maxlength: 50 },
     description: { type: String, required: true },
     price: { type: Number, required: true },
-    inStock: { type: Boolean, required: true }
+    inStock: { type: Boolean, required: true },
+    image: { type: String, required: true },
+    category: { type: String, required: true }
   }
 );
 
-
-
-productSchema.pre('findOneAndUpdate', function () {
+gameSchema.pre('findOneAndUpdate', function () {
   const update = this.getUpdate();
   if (update.__v != null) {
     delete update.__v;
@@ -31,4 +31,4 @@ productSchema.pre('findOneAndUpdate', function () {
 });
 
 // Export the model
-module.exports = mongoose.model("product", productSchema);
+module.exports = mongoose.model("game", gameSchema);

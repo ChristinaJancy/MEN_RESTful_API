@@ -16,7 +16,7 @@ components:
       name: auth-token
 
   schemas:
-    Product:
+    Game:
       type: object
       properties:
         id:
@@ -29,6 +29,10 @@ components:
           type: number
         inStock:
           type: boolean
+        image: 
+          type: string
+        category:
+          type: string
     
     User:
       type: object
@@ -98,23 +102,23 @@ paths:
                     type: string
 
 
-  /products:
+  /games:
     get:
-      summary: Retrieves a list of Products
-      description: Retrieves a list of products as JSON objects.
+      summary: Retrieves a list of games
+      description: Retrieves a list of games as JSON objects.
       responses:
         200:
-          description: A list of product JSON objects in an array.
+          description: A list of game JSON objects in an array.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Product"
+                  $ref: "#/components/schemas/Game"
     
     post:
-      summary: Create a new Product
-      description: Create a new Product
+      summary: Create a new game
+      description: Create a new game
       security:
         - ApiKeyAuth: []      
       requestBody:
@@ -122,20 +126,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Product"
+              $ref: "#/components/schemas/Game"
 
       responses:
         201:
-          description: Product created succesfully
+          description: game created succesfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Product"
+                $ref: "#/components/schemas/Game"
   
-  /products/{id}:
+  /games/{id}:
     get:
-      summary: Specific Product
-      description: Retrieves a specific Product based on it id.
+      summary: Specific Game
+      description: Retrieves a specific Game based on it id.
       parameters:
         - in: path
           name: id
@@ -145,17 +149,17 @@ paths:
             type: string
       responses:
         200:
-          description: A Product in the format of a JSON object.
+          description: A Game in the format of a JSON object.
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/Product"
+                  $ref: "#/components/schemas/Game"
    
     put:
-      summary: Updates a specific Product
-      description: Updates a specific Product based on it id
+      summary: Updates a specific Game
+      description: Updates a specific Game based on it id
       security:
         - ApiKeyAuth: []            
       parameters:
@@ -170,19 +174,19 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Product"
+              $ref: "#/components/schemas/Game"
 
       responses:
         201:
-          description: Product updated succesfully
+          description: Game updated succesfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Product"
+                $ref: "#/components/schemas/Game"
 
     delete:
-      summary: Deletes a specific Product
-      description: Deletes a specific Product based on it id
+      summary: Deletes a specific Game
+      description: Deletes a specific Game based on it id
       security:
         - ApiKeyAuth: []            
       parameters:
@@ -195,10 +199,10 @@ paths:
 
       responses:
         201:
-          description: Product deleted succesfully
+          description: Game deleted succesfully
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Product"
+                $ref: "#/components/schemas/Game"
 
   
