@@ -2,9 +2,9 @@ const router = require("express").Router();
 const game = require("../models/game");
 const { verifyToken } = require("../validation");
 
-// Create new game
+// Create new game 
 router.post("/", verifyToken, (req, res) => {
-//router.post("/", (req, res) => {
+    //router.post("/", (req, res) => {
     const data = req.body;
     game.insertMany(data)
         .then(data => { res.status(201).send(data); })
@@ -12,16 +12,16 @@ router.post("/", verifyToken, (req, res) => {
 });
 
 router.get("/", (req, res) => {
-    //advanced query by name
+    //advanced query by name 
     const name = req.query.name;
- 
+
     var condition = name ? { name: { $regex: new RegExp(name), $options: "i" } } : {};
     game.find(condition)
         .then(data => { res.send(data); })
         .catch(err => { res.status(500).send({ message: err.message }); });
 });
 
-// Retrieve games based on stock
+// Retrieve games based on stock 
 router.get("/instock", verifyToken, (req, res) => {
     game.find({ inStock: true })
         .then(data => { res.send(data); })
@@ -34,9 +34,9 @@ router.get("/:id", (req, res) => {
         .catch(err => { res.status(500).send({ message: err.message }); });
 });
 
-// Update game
+// Update game using id
 router.put("/:id", verifyToken, (req, res) => {
-//router.put("/:id", (req, res) => {
+    //router.put("/:id", (req, res) => { 
     const id = req.params.id;
 
     game.findByIdAndUpdate(id, req.body)
@@ -52,12 +52,12 @@ router.put("/:id", verifyToken, (req, res) => {
 
 });
 
-// Delete game
+// Delete game using id
 //router.delete("/:id", (req, res) => {
 router.delete("/:id", verifyToken, (req, res) => {
     const id = req.params.id;
 
-    game.findByIdAndRemove(id,{useFindAndModify: false})
+    game.findByIdAndRemove(id, { useFindAndModify: false })
         .then(data => {
             if (!data) {
                 res.status(404).send({

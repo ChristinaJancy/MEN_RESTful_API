@@ -20,7 +20,7 @@ router.post("/register", async (req, res) => {
         return res.status(400).json({ error: "Email already exists" });
     }
 
-    //hash password
+    //hash password before saving in database
     const salt = await bcrypt.genSalt(10);
     const password = await bcrypt.hash(req.body.password, salt);
 
@@ -30,38 +30,38 @@ router.post("/register", async (req, res) => {
         email: req.body.email,
         password
     });
-
-    try {
+ //     try to save user in database (via try-catch)
+    try { 
         const savedUser = await user.save(); //save user
         res.json({ error: null, data: savedUser._id });
-    } catch (error) {
+    } catch (error) { //if error, return error
         res.status(400).json({ error });
     }
-
+    // res.send("User registered successfully");
 });
 
 router.post("/login", async (req, res) => {
 
-    //validate user login info
+    //validate user login info (email, password)
     const { error } = loginValidation(req.body);
 
     if (error) {
         return res.status(400).json({ error: error.details[0].message });
     }
 
-    //if login info is valid find the user
+    //if login info is valid find the user by email in database
     const user = await User.findOne({ email: req.body.email });
 
-    //throw error if email is wrong - user does not exist in DB
+    //throw error if email is wrong - user does not exist in DB 
     if (!user) {
         return res.status(400).json({ error: "Email is wrong" });
     }
 
-    //check for password correctness
+    //check for password correctness - compare hashed password with password from DB
     const validPassword = await bcrypt.compare(req.body.password, user.password);
 
-    //throw error if password is wrong
-    if (!validPassword) {
+    //throw error if password is wrong 
+    if (!validPassword) { 
         return res.status(400).json({ error: "Password is wrong" })
     }
 
